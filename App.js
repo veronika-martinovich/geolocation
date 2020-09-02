@@ -27,29 +27,9 @@ export default function App() {
           },
         }}
       >
-        <Tab.Screen
-          name="Weather"
-          component={CurrentWeatherScreen}
-          style={styles.tab}
-        />
-        <Tab.Screen
-          name="History"
-          component={WeatherHistoryScreen}
-          style={styles.tab}
-        />
+        <Tab.Screen name="Weather" component={CurrentWeatherScreen} />
+        <Tab.Screen name="History" component={WeatherHistoryScreen} />
       </Tab.Navigator>
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  tab: {
-    flex: 1,
-  },
-});
