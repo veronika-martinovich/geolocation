@@ -39,6 +39,32 @@ export const CurrentWeatherScreen = () => {
   const findWeather = async (location) => {
     const forecast = await getWeatherByLocation(location);
     setForecast(forecast);
+    addWeather(forecast);
+  };
+
+  const addWeather = async (forecast) => {
+    const response = await fetch(
+      "https://react-native-weather-85a81.firebaseio.com/weather.json",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          lat: lat,
+          lon: lon,
+          time: time,
+          location: location,
+          description: forecast.weather[0].description,
+          humidity: forecast.main.humidity,
+          pressure: forecast.main.pressure,
+          temp: forecast.main.temp,
+          wind: forecast.wind.speed,
+        }),
+      }
+    );
+    const data = await response.json();
+    console.log(data);
   };
 
   useEffect(() => {
@@ -69,6 +95,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "flex-start",
-    backgroundColor: THEME.BG_COLOR
+    backgroundColor: THEME.BG_COLOR,
   },
 });
