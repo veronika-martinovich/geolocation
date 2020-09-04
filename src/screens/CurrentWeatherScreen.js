@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Alert } from "react-native";
-import { transformCoords } from "../utilities/transformCoords";
-import { THEME } from "../theme";
 import { getLocationByCoords } from "../utilities/getLocationByCoords";
 import { getWeatherByLocation } from "../utilities/getWeatherByLocation";
+import { Coords } from "../components/Coords";
+import { Location } from "../components/Location";
+import { WeatherIcon } from "../components/WeatherIcon";
+import { WeatherData } from "../components/WeatherData";
+import { THEME } from "../theme";
 
 export const CurrentWeatherScreen = () => {
   const [lat, setLat] = useState(null);
   const [lon, setLon] = useState(null);
   const [time, setTime] = useState(null);
   const [location, setLocation] = useState(null);
-  const [weather, setWeather] = useState(null);
+  const [forecast, setForecast] = useState(null);
 
   const findCoordinates = async () => {
     await navigator.geolocation.getCurrentPosition(
@@ -18,59 +21,54 @@ export const CurrentWeatherScreen = () => {
         setLat(position.coords.latitude);
         setLon(position.coords.longitude);
         setTime(position.coords.timestamp);
+        findLocation(position.coords.latitude, position.coords.longitude);
       },
       (error) => Alert.alert(error.message)
     );
   };
 
-  const findLocation = async () => {
+  const findLocation = async (lat, lon) => {
+    console.log(lat, lon);
     const locationCity = await getLocationByCoords(lat, lon);
-    setLocation(
-      locationCity.response.GeoObjectCollection.featureMember[3].GeoObject.name
-    );
+    const location = locationCity.results[0].locality;
+    console.log("findLocation", location);
+    setLocation(location);
+    findWeather(location);
   };
 
-  const findWeather = async () => {
-    const weather = await getWeatherByLocation(location);
-    setWeather(weather);
-    console.log(weather);
+  const findWeather = async (location) => {
+    const forecast = await getWeatherByLocation(location);
+    setForecast(forecast);
   };
 
   useEffect(() => {
     findCoordinates();
-    findLocation();
-    findWeather();
   }, []);
 
-  if (!lat || !lon || !location || !weather) return null;
-
+  if (!lat || !lon || !location || !forecast) return null;
   return (
     <View style={styles.weatherScreen}>
-      <View style={styles.coordsContainer}>
-        <Text style={styles.coordsText}>Latitude: {transformCoords(lat)}</Text>
-        <Text style={styles.coordsText}>Longitude: {transformCoords(lon)}</Text>
-        <Text style={styles.coordsText}>{location}</Text>
-        <Text style={styles.coordsText}>{weather.main.humidity}</Text>
-      </View>
+      <Coords lat={lat} lon={lon} />
+      <Location location={location} />
+      <WeatherIcon iconId={forecast.weather[0].icon} />
+      <WeatherData
+        description={forecast.weather[0].description}
+        humidity={forecast.main.humidity}
+        pressure={forecast.main.pressure}
+        temp={forecast.main.temp}
+        wind={forecast.wind.speed}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   weatherScreen: {
+    flex: 1,
     paddingTop: 50,
     flexDirection: "column",
     alignItems: "center",
-    justifyContent: "center",
-  },
-  coordsContainer: {
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  coordsText: {
-    fontSize: 20,
-    color: THEME.PRIMARY_DARK_COLOR,
-    marginBottom: 5,
+    justifyContent: "flex-start",
+    backgroundColor: THEME.BG_COLOR
   },
 });
