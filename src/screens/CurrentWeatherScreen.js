@@ -11,7 +11,6 @@ import { THEME } from "../theme";
 export const CurrentWeatherScreen = () => {
   const [lat, setLat] = useState(null);
   const [lon, setLon] = useState(null);
-  const [time, setTime] = useState(null);
   const [location, setLocation] = useState(null);
   const [forecast, setForecast] = useState(null);
 
@@ -20,7 +19,6 @@ export const CurrentWeatherScreen = () => {
       (position) => {
         setLat(position.coords.latitude);
         setLon(position.coords.longitude);
-        setTime(position.coords.timestamp);
         findLocation(position.coords.latitude, position.coords.longitude);
       },
       (error) => Alert.alert(error.message)
@@ -44,7 +42,7 @@ export const CurrentWeatherScreen = () => {
 
   const addWeather = async (forecast) => {
     const response = await fetch(
-      "https://react-native-weather-85a81.firebaseio.com/weather.json",
+      "https://rn-weather-528cb.firebaseio.com/weather.json",
       {
         method: "POST",
         headers: {
@@ -53,7 +51,7 @@ export const CurrentWeatherScreen = () => {
         body: JSON.stringify({
           lat: lat,
           lon: lon,
-          time: time,
+          time: new Date(),
           location: location,
           description: forecast.weather[0].description,
           humidity: forecast.main.humidity,

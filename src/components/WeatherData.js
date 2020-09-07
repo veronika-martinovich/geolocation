@@ -26,7 +26,8 @@ export const WeatherData = ({
 const styles = StyleSheet.create({
   weatherDataContainer: {
     flexDirection: 'column',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginBottom: 10
   },
   weatherData: {
     fontSize: 25,
